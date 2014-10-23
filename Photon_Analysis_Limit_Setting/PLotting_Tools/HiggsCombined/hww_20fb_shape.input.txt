@@ -1,0 +1,18 @@
+imax 1 number of bins
+jmax 1 number of processes minus 1
+kmax 3 number of nuisance parameters
+----------------------------------------------------------------------------------------------
+shapes *         ofj0      hww_20fb_shape.input.root histo_$PROCESS histo_$PROCESS_$SYSTEMATIC
+shapes data_obs  ofj0      hww_20fb_shape.input.root histo_Data
+----------------------------------------------------------------------------------------------
+bin          ofj0  
+observation  5729.0
+----------------------------------------------------------------------------------------------
+bin                                         ofj0       ofj0     
+process                                     ggH        qqWW     
+process                                     0          1        
+rate                                        228.1320   3981.6820
+----------------------------------------------------------------------------------------------
+CMS_hww_0j_WW_8TeV_SHAPE   lnN              -          1.1      
+CMS_hww_MVAWWBounding   shape               -          1.0      
+uncert_HWW              lnN                 1.2        1.0    

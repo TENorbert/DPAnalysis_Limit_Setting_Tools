@@ -1,0 +1,25 @@
+imax 1 number of bins
+jmax 1 number of processes minus 1
+kmax 0 number of nuisance parameters #Systematics sources
+#kmax 3 number of nuisance parameters (#source of systematic uncertainties)
+----------------------------------------------------------------------------------------------
+shapes bgTime   h_         hStats_v3.root      h_$PROCESS     #histo_$PROCESS_$SYSTEMATIC
+shapes sgTime_CT4000  h_   hStats_v3.root               h_$PROCESS  #histo_$PROCESS_$SYSTEMATIC
+shapes data_obs  h_        hStats_v3.root      h_dataTime
+----------------------------------------------------------------------------------------------
+bin           h_ 
+# Number of Events Observed in Data
+#observation  16301.0
+observation  -1.0
+----------------------------------------------------------------------------------------------
+bin                                         h_                      h_  
+process                                     sgTime_CT4000           bgTime     
+process                                     0                       1        
+rate                                        11.36                   1.00        
+#rate                                        228.1320      3981.6820
+----------------------------------------------------------------------------------------------
+#Systematics 
+#lumi                         lnN             -            1.1      
+#xs_sig                       shape           -            1.0      
+#bkg_norm                     lnN            1.2           1.0    
+----------------------------------------------------------------------------------------------

@@ -1,0 +1,23 @@
+# Simple counting experiment, with one signal and one background
+# For Dislaced Photon Analysis
+imax 1  number of channels
+jmax 1  number of backgrounds
+kmax 3  number of nuisance parameters (sources of systematical uncertainties)
+------------
+# we have just one channel, in which we observe 0 events
+bin time
+observation 8.0
+------------
+# now we list the expected events for signal and all backgrounds in that bin
+# the second 'process' line must have a positive number for backgrounds, and 0 for signal.
+# the line starting with 'rate' gives the expected yield for each process.
+# Then (after the '-----'-line), we list the independent sources of uncertainties, and give their effect (syst. error)
+# on each process and bin, in this case none.
+bin             time        time
+process         sig         bkg
+process          0          1 
+rate            6.962       5.000
+------------
+lumi     lnN    1.05        -   lumi affects both signal and background (mc-driven). lnN = lognormal
+xs_sig   lnN    1.10        -    signal efficiency + acceptance (10%)
+bkg_norm lnN      -         1.20   background rate (=> 20% statistical uncertainty)
