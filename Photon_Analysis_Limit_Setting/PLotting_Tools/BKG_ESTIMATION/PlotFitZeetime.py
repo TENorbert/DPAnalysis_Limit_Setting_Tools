@@ -91,7 +91,7 @@ def mygaus(t, par){
  #Main fxn doing the job
 def main():
         
-	ifile =  TFile("single_photon_R2012C_TimePerf-plots.root","read") # get input files
+	ifile =  TFile("BACKGROUND_TimePerf-plots.root","read") # get input files
         
 	fitFcn  = TF1("fitFcn", mygaus, FitLowRange, FitHighRange, 3 )
 	fitFcn.SetNpx(500)

@@ -23,6 +23,7 @@
 #include  "TSystem.h"
 #include  "TMath.h"
 #include  "TPaveText.h"
+#include  "TLatex.h"
 #include  "TPaveLabel.h"
 #include  "TVirtualFitter.h"
 #include  "TMatrixT.h"
@@ -224,9 +225,30 @@ void FfxnS( TF1* fxnfit){
 void CanS ( TCanvas* ct ){
    ct->SetGridx();
    ct->SetGridy();
-   ct->GetFrame()->SetFillColor(21);
+   ct->GetFrame()->SetFillColor(10);
    ct->GetFrame()->SetBorderMode(-1);
    ct->GetFrame()->SetBorderSize(5);
+
+   std::string s_lumi;
+   std::string CoMEr;
+   s_lumi = "19.1";
+   //CoMEr = "#sqrt{(S)} = 8 TeV";
+   CoMEr = "(8 TeV)";
+   //std::string lint = "#int Ldt= "+s_lumi+" fb^{-1}";
+   std::string lint = s_lumi + "fb^{-1}"+ CoMEr;
+   TLatex cmstex;
+   cmstex.SetTextAlign(12);
+   cmstex.SetTextSize(0.035);
+   cmstex.SetTextFont(22);
+   cmstex.SetTextAngle(0);
+   cmstex.SetTextColor(kBlack);
+   cmstex.SetNDC();
+  // cmstex.DrawLatex(0.155, 0.967, "CMS Preliminary");
+  // cmstex.DrawLatex(0.43, 0.967, CoMEr.c_str());
+  // cmstex.DrawLatex(0.75, 0.96, lint.c_str());
+   cmstex.DrawLatex(0.20, 0.865, "CMS");
+   cmstex.DrawLatex(0.20, 0.832, "Preliminary");
+   cmstex.DrawLatex(0.72, 0.920, lint.c_str());
 /* c1->Divide(2,1);  */
 }
 
@@ -546,13 +568,13 @@ void PlotHists( TH1F *h_zmass, TH1F *h_stime,TH1F* h_zbkg, TF1 *fitf, TF1* ffpfx
    fitf->Draw("sames");
    c1->SetLogy(1);
    c1->Update();
-   
+  
    CanS( c2 );	
    c2->cd();
    h_stime->Draw(); // time after subtraction
    c2->SetLogy(1);
    c2->Update();
-  
+
    CanS( c3 );	
    c3->cd();
    h_zmass->Draw();
@@ -560,17 +582,19 @@ void PlotHists( TH1F *h_zmass, TH1F *h_stime,TH1F* h_zbkg, TF1 *fitf, TF1* ffpfx
    ffpfxn->SetLineWidth(5);
    ffpfxn->Draw("sames");
    c3->SetLogy(1);
-   c3->Update();
-   
+   c3->Update(); 
+
    printf("++++++++++ now saving canvas...\n");
    TString plotname1 = PNAME1 ;
    c1->Print( plotname1 );
    c1->SaveAs(CNAME1);
    
+   CanS(c2);
    TString plotname2 = PNAME2 ;
    c2->Print( plotname2 );
    c2->SaveAs(CNAME2);
-   
+  
+   CanS(c3); 
    c3->Print("Background_In_ZMass-From-Di-Photon.pdf"); 
    c3->SaveAs("Background_In_ZMass-From-Di-Photon.png"); 
  }       
@@ -608,6 +632,9 @@ void Fit_Hist( TH1F* ihist, TF1* fitfxn, TCanvas*c1, TLegend *leg, TPaveLabel* p
    pav1->Draw();
    pav2->Draw();
    c1->Update();
+   
+   //CanS(c1);
+
    cout <<"Saving Canvas..." << endl;
    TString plotname = PNAME2 ;
    c1->Print( plotname );
@@ -643,9 +670,9 @@ void BackgroundEstimation( )
    if(h_ZmassBkg == 0){ std::cout  <<"!! Histogram Does not exist!!" << std::endl; throw 1;}
    
   // TLegend *lgEB = new TLegend(0.15,0.65,0.40,0.85);
-   TCanvas *C1 = new TCanvas("C1",CANV1,800, 700); //10,800,900);
-   TCanvas *C2 = new TCanvas("C2",CANV2,800, 700); //10,800,900);
-   TCanvas *C3 = new TCanvas("C3","Background",800, 700); //10,800,900);
+   TCanvas *C1 = new TCanvas("C1",CANV1,900, 900); //10,800,900);
+   TCanvas *C2 = new TCanvas("C2",CANV2,900, 900); //10,800,900);
+   TCanvas *C3 = new TCanvas("C3","Background",900,900); //10,800,900);
   // TPaveLabel *pv1 = new TPaveLabel(1.3,16000,3.0,19000,SIGMA);  // for EB time diff
    //TPaveLabel *pv1 = new TPaveLabel(1.3,1000,3.0,1200,SIGMA);       // for EE time diff
    //TPaveLabel *pv1 = new TPaveLabel(1.2,2000,3.0,2450,SIGMA);       // for EE time 
