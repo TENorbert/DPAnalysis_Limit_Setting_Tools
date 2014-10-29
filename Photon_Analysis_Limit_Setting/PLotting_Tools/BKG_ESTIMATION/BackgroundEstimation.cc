@@ -36,14 +36,14 @@
 #include "MathFunctions.h"
 
 //** Define Fit Constants **//
-#define MassL 26 //36  // 86GeV Bin  76 GeV = Bin 26
-#define MassH 51 //47  // 96 GeV=Bin 47 While 100GeV = bin 51
+#define MassL 25 //36  // 86GeV Bin  76 GeV = Bin 26 80 GeV = Bin 31 75GeV = bin 25
+#define MassH 50 //47  // 96 GeV=Bin 47 While 100GeV = bin 51
 #define bmin  50  //60  //64 //86
 #define bmax  130 //102 //100 //96
 #define Mmin  50
 #define Mmax  130
-#define tmin -5.0
-#define tmax  5.0
+#define tmin -4.0
+#define tmax  15.0
 #define LRange  46 //43  // -3ns Bin   -2ns = binX= 47
 #define HRange  73 //73 //78  // 3 ns bin  +2ns = binX = 73
 
@@ -67,7 +67,8 @@
 #define Title1  "Invariant Mass"
 #define Title2  "Seed Time[ns]"
 //#define YTitle "numb. electron pairs/0.05ns" 
-#define YTIT2 "numb. electrons/0.05ns"
+//#define YTIT2 "numb. electrons/0.05ns"
+#define YTIT2 "Numb. electrons/0.2ns"
 #define XTIT2 "t_{electron}[ns]"  
 #define YTIT "numb. Events/1GeV"
 #define XTIT "M_{#gamma^{1}, #gamma^{2}}[GeV/c^{2}]"  
@@ -328,8 +329,8 @@ TH1F* RebinHistogram( TH1F* h1, TH1F* h2, double minBC ) {
       for(int i = 1; i<=hin->GetNbinsX()+1; i++){
            for(int j =1; j<= hin->GetNbinsY()+1;j++){
 	       if(hin->GetBinContent(i, j) <=0)  {
-	          hin->SetBinContent(i, j, 1.e-5);
-                  hin->SetBinError(i, j, 1.e-5);
+	          hin->SetBinContent(i, j, 1.e-10);
+                  hin->SetBinError(i, j, 1.e-10);
 	}
       }
     }
@@ -386,7 +387,9 @@ Double_t FitAndGetScaleF(TH1F *h2fit, TH1F *h_zmbkg,  TF1* fitf, TF1* fxnCalc)
 
    // Calculate Scaling From Integrals
     Nin = fxnCalc->Integral( 76.0, 100.0);
+    //Nin = fxnCalc->Integral( 80.0, 100.0);
     //Nin = CalcFxnInt( h2fit, fxnCalc, MassL, MassH ) ;
+    //M1out = fxnCalc->Integral(50.0 , 75.0 );
     M1out = fxnCalc->Integral(50.0 , 75.0 );
     M2out = fxnCalc->Integral(101.0, 130.0 );
      
@@ -428,9 +431,9 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     printf("#####################################################\n");
     std::cout <<" TOTAL BACKGROUND EVENTS BEFORE SCALING... =  " << hbtime->Integral(lowt, hit) << std::endl;
     printf("#####################################################\n");
-    tailNumLB4 = hstime->Integral(lowt, binTL, "width" ); //  t < -3ns
-    tailNumRB4 = hstime->Integral(binTU, hit, "width");   //   t > 3ns 
-    intimeNumB4 = hstime->Integral(binWL , binWU, "width"); // -2 < t < 2
+    tailNumLB4 = hstime->Integral(lowt, binTL ); //  t < -3ns
+    tailNumRB4 = hstime->Integral(binTU, hit);   //   t > 3ns 
+    intimeNumB4 = hstime->Integral(binWL , binWU); // -2 < t < 2
    
     //RatioB4 = (intimeNumB4 == 0) ? (0) : ( (tailNumLB4 + tailNumRB4)/intimeNumB4 );
     RatioB4 = (tailNumLB4 <= 0) ? ( tailNumRB4/intimeNumB4 ) : ( (tailNumLB4 + tailNumRB4)/intimeNumB4 );
@@ -457,8 +460,8 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     //TH1F *hbtimenew = (TH1F*)hbtime->Rebin(NewMergeBinNum,"hbtimenew" ) ;
     TH1F* hstimenew = (TH1F*)hstime->Clone();
     TH1F* hbtimenew = (TH1F*)hbtime->Clone();
-    hstimenew = (TH1F*)RebinHistogram(hstime, hstimenew, MinBinC) ;
-    hbtimenew = (TH1F*)RebinHistogram(hbtime, hbtimenew, MinBinC) ;
+   // hstimenew = (TH1F*)RebinHistogram(hstime, hstimenew, MinBinC) ;
+   // hbtimenew = (TH1F*)RebinHistogram(hbtime, hbtimenew, MinBinC) ;
     
     printf("#####################################################\n");
     std::cout <<" TOTAL BACKGROUND EVENTS AFTER SCALING ... =  " << hbtime->Integral(lowt, hit) << std::endl;
@@ -471,8 +474,8 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
     //protectZeroBin( hstime );
     //protectZeroBin( hstime );
-    //protectZeroBin( hbtimenew );
-   // protectZeroBin( hbtimenew );
+      protectZeroBin( hstimenew );
+      protectZeroBin( hbtimenew );
 
   /*
     hstime->Add(hbtime, -1);
@@ -491,9 +494,9 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     printf("*****************************************************\n");
     std::cout <<" TOTAL EVENTS  AFTER SUBTRACTION =  " << hstimenew->Integral(lowt, hit) << std::endl;
     printf("*****************************************************\n");
-    tailNumL = hstimenew->Integral(lowt, binTL, "width" );    // t < -3 ns
-    tailNumR = hstimenew->Integral(binTU, hit, "width");   // t > 3 ns
-    intimeNum = hstimenew->Integral(binWL , binWU, "width");   // -2 < t < 2 ns
+    tailNumL = hstimenew->Integral(lowt, binTL );    // t < -3 ns
+    tailNumR = hstimenew->Integral(binTU, hit);   // t > 3 ns
+    intimeNum = hstimenew->Integral(binWL , binWU);   // -2 < t < 2 ns
    
   //  Ratio = (intimeNum == 0) ? (0) : ( (tailNumL + tailNumR)/intimeNum );
     Ratio  = (tailNumL <= 0) ? ( tailNumR/intimeNum ) : ( (tailNumL + tailNumR)/intimeNum );
@@ -507,9 +510,20 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
 
     printf("=======================================================================================================\n");
   
-    hstimenew->Scale(1.0/hstimenew->Integral());
+    //hstimenew->Scale(1.0/hstimenew->Integral());
+    protectZeroBin(hstimenew);
+    /*TH1F* hbck_expt = (TH1F*)RebinHistogram(hstimenew, hbck_expt, MinBinC); 
+    hbck_expt->Scale(1.0/hbck_expt->Integral()); 
+    hbck_expt->Rebin(3);
+    hbck_expt->GetXaxis()->SetRangeUser(-4.5, 15.5);
+    return hbck_expt ; 
+    */
+   // hstimenew->Scale(1.0/hstimenew->Integral()); 
+    hstimenew->Rebin(4);
+    hstimenew->GetXaxis()->SetRangeUser(-4.0, 15.0);
+   // hstimenew->GetYaxis()->SetRangeUser(1.5e-7, 1.0);
+    hstimenew->GetYaxis()->SetRangeUser(1.0, 1.5e6);
     return hstimenew ; 
-
  } 
  
 
@@ -606,14 +620,18 @@ void Fit_Hist( TH1F* ihist, TF1* fitfxn, TCanvas*c1, TLegend *leg, TPaveLabel* p
 void BackgroundEstimation( )
  {
   // PlotStyle();
-   // Input Files
-   TFile* fileD  = new TFile("Mass_OfZ_Within_75And100GeV_TimePerf-plots.root","READ");
-   TFile* fileS  = new TFile("Mass_OfZ_Within_75And100GeV_TimePerf-plots.root","READ");
-   TFile* fileB  = new TFile("Mass_OfZ_OutSide75And100GeV_TimePerf-plots.root","READ");
+   // Input Files // 75 t0 100GeV
+   TFile* fileD  = new TFile("SIGNAL_TimePerf-plots.root","READ");
+   TFile* fileS  = new TFile("SIGNAL_TimePerf-plots.root","READ");
+   TFile* fileB  = new TFile("BACKGROUND_TimePerf-plots.root","READ");
+   // Input files // 80 to 100GeV
+   //TFile* fileD  = new TFile("SIG_TimePerf-plots.root","READ");
+  // TFile* fileS  = new TFile("SIG_TimePerf-plots.root","READ");
+  // TFile* fileB  = new TFile("BKG_TimePerf-plots.root","READ");
    //TF1 *fitf  = new TF1("fitFcn", mygaus, FitLowRange, FitHighRange, 3 );
   // TF1 *gfit  = new TF1("gfit", MathFunctions::mygauss, bmin, bRejectmax, 3 );
-   TF1 *gfit  = new TF1("gfit", MathFunctions::fitPolyReject, bmin, bmax, 4 );
-   TF1 *gfxn  = new TF1("gfxn", MathFunctions::fitPoly, 50.0, 130.0, 4 );
+     TF1 *gfit  = new TF1("gfit", MathFunctions::fitPolyReject, bmin, bmax, 4 );
+     TF1 *gfxn  = new TF1("gfxn", MathFunctions::fitPoly, 50.0, 130.0, 4 );
   
    TH1F *h_ZMass = (TH1F*)fileD->Get(ZMASS);
    TH1F *h_ZStime = (TH1F*)fileS->Get(HZsigTime);
@@ -639,14 +657,25 @@ void BackgroundEstimation( )
    Double_t SF = FitAndGetScaleF( h_ZMass, h_ZmassBkg, gfit, gfxn );
    
    // Scaled and Subtract Binned Histograms
-   TH1F* h_Fsigtime = ScaleAndSubtractHists( h_ZStime, h_ZBtime, SF );
+   TH1F* exp_bkgtime = ScaleAndSubtractHists( h_ZStime, h_ZBtime, SF );
    
    TF1* fffpams = GetFxnFromFitPams( h_ZmassBkg, gfit, gfxn );
    // Plot Histograms in Subtract && Devide Format
-   PlotHists( h_ZMass, h_Fsigtime, h_ZmassBkg, gfit, fffpams, C1, C2, C3 );
+   PlotHists( h_ZMass, exp_bkgtime, h_ZmassBkg, gfit, fffpams, C1, C2, C3 );
 
 
    printf("=======>>>>>> Done with Ploting .... =====<<<<<<\n");
+   
+   TFile* Ofile = new TFile("Bkg_dataSet.root","RECREATE");
+   Ofile->cd();
+   exp_bkgtime->SetName("histo_exp_bkgtime");
+   exp_bkgtime->Rebin(2);
+   exp_bkgtime->GetXaxis()->SetRangeUser(-4.5, 15.5);
+   exp_bkgtime->Write();
+   Ofile->Close();
+   Ofile->Save();
+
+   delete Ofile;
 
  }
 

@@ -15,7 +15,8 @@ Double_t MathFunctions::fitPolyReject(Double_t *x, Double_t *par) {
                           + (par[2]* x[0]*x[0]  )
                           + (par[3]* x[0]*x[0]*x[0] );
 
-          if( x[0] > 76.0 && x[0] < 100.0  ) 
+          if( x[0] > 75.0 && x[0] < 100.0  ) 
+          //if( x[0] > 80.0 && x[0] < 100.0  ) 
           //if( x[0] > 86.0 && x[0] < 96.0  ) 
           {
            TF1::RejectPoint();
