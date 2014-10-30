@@ -231,11 +231,13 @@ void CanS ( TCanvas* ct ){
 
    std::string s_lumi;
    std::string CoMEr;
-   s_lumi = "19.1";
+   //s_lumi = "19.1";
+   s_lumi = "";
    //CoMEr = "#sqrt{(S)} = 8 TeV";
-   CoMEr = "(8 TeV)";
+   CoMEr = "(#sqrt{s} = 8 TeV)";
    //std::string lint = "#int Ldt= "+s_lumi+" fb^{-1}";
-   std::string lint = s_lumi + "fb^{-1}"+ CoMEr;
+   //std::string lint = s_lumi + "fb^{-1}"+ CoMEr;
+   std::string lint = s_lumi + CoMEr;
    TLatex cmstex;
    cmstex.SetTextAlign(12);
    cmstex.SetTextSize(0.035);
