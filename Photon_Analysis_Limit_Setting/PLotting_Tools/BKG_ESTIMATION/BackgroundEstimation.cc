@@ -72,7 +72,7 @@
 #define YTIT2 "Numb. electrons/0.2ns"
 #define XTIT2 "t_{electron}[ns]"  
 #define YTIT "numb. Events/1GeV"
-#define XTIT "M_{#gamma^{1}, #gamma^{2}}[GeV/c^{2}]"  
+#define XTIT "M_{e,e}[GeV/c^{2}]"  
 #define FITTYPE "GAUS FIT"
 #define CMSRESULT "CMS Preliminary 2012"
 #define LHC     "#sqrt{s}=8 TeV  L=8.5 fb^{-1}"
@@ -91,10 +91,10 @@
 #define HNZMass "EBEB/NZmass" 
 
 #define CNAME2 "Seed_Time_From_Uncleaned_di_photon_Mass_Fit_DoubleElectron_Run2012A.png" 
-#define PNAME2 "Seed_Time_From_Uncleaned_di_photon_Mass_Fit_DoubleElectron_Run2012A..pdf"  
+#define PNAME2 "Seed_Time_From_Uncleaned_di_photon_Mass_Fit_DoubleElectron_Run2012A.pdf"  
 
 #define CNAME1 "Uncleaned_di_Photon_ZMass_Fit_DoubleElectron_Run2012A.png" 
-#define PNAME1 "Uncleaned_di_Photon_ZMass_Fit_DoubleElectron_Run2012A..pdf"  
+#define PNAME1 "Uncleaned_di_Photon_ZMass_Fit_DoubleElectron_Run2012A.pdf"  
 using namespace std;
 /*
 const signed FitLowRange  = -3; 
@@ -468,7 +468,7 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     std::cout << "==> B4 SCALING: ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  tailNumLB4  << std::endl ; 
     std::cout << "==> B4 SCALING: ELECTRON CANDIDATES WITH   t > 3 ns =\t" << tailNumRB4 << std::endl;  
     std::cout << "==> B4 SCALING: ELECTRON CANDIDATES WITH  |t| > 3 ns =\t" << tailNumLB4 + tailNumRB4 << std::endl; 
-    std::cout << "==> B4 SCALING: RATION OF ELECTRON CANDIDATES  WITH |t| > 3 ns / |t| < 2ns =\t" <<  RatioB4 << std::endl ;
+    std::cout << "==> B4 SCALING: RATION OF ELECTRON CANDIDATES  WITH t > 3 ns / |t| < 2ns =\t" <<  RatioB4 << std::endl ;
 
     printf("==============================================================================================\n");
 
@@ -530,7 +530,7 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     std::cout << "==> AFTER SUBTRACTION:  ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  tailNumL  << std::endl ; 
     std::cout << "==> AFTER SUBTRACTION:  ELECTRON CANDIDATES WITH   t > 3 ns =\t" << tailNumR << std::endl;  
     std::cout << "==> AFTER SUBTRACTION:  ELECTRON CANDIDATES WITH   |t| > 3 ns =\t" << tailNumL + tailNumR << std::endl; 
-    std::cout << "==> AFTER SUBTRACTION:  RATIO OF ELECTRON CANDIDATES  WITH      |t| > 3 ns / |t| < 2ns =\t" <<  Ratio << std::endl ;
+    std::cout << "==> AFTER SUBTRACTION:  RATIO OF ELECTRON CANDIDATES  WITH      t > 3 ns / |t| < 2ns =\t" <<  Ratio << std::endl ;
 
     printf("=======================================================================================================\n");
   

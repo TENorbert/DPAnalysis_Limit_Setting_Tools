@@ -92,7 +92,7 @@ hZmassBg.SetLineWidth(5)
 
 
 # Label Axis
-hZmass.GetXaxis().SetTitle("Mass_{#gamma^{1},#gamma^{2}}[GeV/c^{2}]")
+hZmass.GetXaxis().SetTitle("M_{e,e}[GeV/c^{2}]")
 hZmass.GetYaxis().SetTitle("Events")
 
 
