@@ -1,0 +1,34 @@
+# Simple counting experiment, with one signal and one background
+# For Dislaced Photon Analysis
+imax 1  number of channels
+jmax 1  number of backgrounds
+kmax 11  number of nuisance parameters (sources of systematical uncertainties)
+------------
+# we have just one channel, in which we observe 0 events
+bin time
+observation 1.0
+------------
+# now we list the expected events for signal and all backgrounds in that bin
+# the second 'process' line must have a positive number for backgrounds, and 0 for signal.
+# the line starting with 'rate' gives the expected yield for each process.
+# Then (after the '-----'-line), we list the independent sources of uncertainties, and give their effect (syst. error)
+# on each process and bin, in this case none.
+bin                       time              time 
+process                   sig               bkg
+process                   0                 1 
+rate                      8.993             1.000
+------------------------------------------------------------------------------------------------------------------
+lumi_8TeV          lnN    1.022             -               #lumi affects both signal and background (mc-driven). lnN = lognormal
+xs_sig             lnN    1.10              -               #signal efficiency + acceptance (10%)
+bkg_norm           lnN     -                1.20            #background rate (=> 20% statistical uncertainty)
+pdf_gg             lnN     -                -               #pdf_gg channel uncertainty same for qq or qg or qq_bar channel
+cms_scale_gamma    lnN     -                -               # CMS photon energy scale
+cms_scale_jet      lnN     -                -               # CMS jet energy scale
+cms_res_jet        lnN     -                -               # CMS jet energy resolution
+cms_res_met        lnN     -                -               # CMS MET energy resolution
+cms_eff_gamma      lnN     -                -               # signal efficiency uncertain including Trigger uncertainties
+cms_fake_gamma     lnN     -                -               # photon fake rate
+
+time_ecal          lnN    1.07/0.95         -       #+7% up/ -5% uncertainty
+
+-------------------------------------------------------------------------------------------------------------------

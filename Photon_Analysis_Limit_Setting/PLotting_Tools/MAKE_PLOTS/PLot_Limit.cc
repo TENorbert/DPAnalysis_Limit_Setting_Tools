@@ -130,7 +130,7 @@ int main(int argc, char* argv[] )
    // Make sure at Least two arguments are given
   
      if( argc < 6 ) { 
-                   std::cout <<"Oops! Run Program as: >>  ./doplots CTAU, limitfilename, NumberOfDifferentCTAU,  LambdaValue, LambdaInputfileName, NumberOfLambda" << std::endl; exit(1);
+                   std::cout <<"Oops! Run Program as: >>  ./doplots CTAU, SigmaVsCtauFilename, NumberOfCtauPointsInFile, ValueOfLambda, SigmaVsMassfileName, NumberOfLambdaPoints" << std::endl; exit(1);
 		  } 
   		  
    std::string ctau = argv[1]; // Given Ctau u want shown on plots
@@ -249,16 +249,16 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
        //read = fscanf(fitlog, "%f", &ep );
        
        CtauError[i] = 0. ;
-       Ctau[i] = ctau; //ctauModel[i] ;
+       Ctau[i] = ctau/10; //length in cm //ctauModel[i] ; mm to ns conversion /300mm/ns
        Lambda[i] = lambda; //lambdaModel[i] ;
-       Up2sigma[i] = TwoSigUp*sgXsec/eff; //(eff*lumi) ;
+       Up2sigma[i] = TwoSigUp*sgXsec/eff; //(eff*lumi) ; pb to fb conversion
        Up1sigma[i] = OneSigUp*sgXsec/eff; //(eff*lumi) ;
        MedianExp[i] =mexp*sgXsec/eff; //(eff*lumi) ;
        Down2sigma[i] =TwoSigD*sgXsec/eff; //(eff*lumi) ;
        Down1sigma[i] =OneSigD*sgXsec/eff; //(eff*lumi) ;
        Observed[i] = Obs_limit*sgXsec/eff; //(eff*lumi) ;
        //aep[i] = ep / (eff*lumi) ;
-       sigXsec[i] = sgXsec ;
+       sigXsec[i] = sgXsec ;    // pb to fb conversion
        //printf(" mexp: %f, eff: %f , MedianExp: %f \n", mexp, eff, MedianExp[i] ) ;
        //printf(" %f, %f, %f, %f, %f \n", TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp ) ;
        if ( read != 1 ) cout<<" reading error "<<endl ;
@@ -294,35 +294,38 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    gPad->Modified();
   // gAllp->GetXaxis()->SetLimits( Ctau[0], Ctau[NumModels-1] ) ;
    //gAllp->GetXaxis()->SetLimits( Ctau[0], 6500);//Ctau[NumModels-1] ) ;
-   gAllp->GetXaxis()->SetLimits(50, 12500);//Ctau[NumModels-1] ) ;
-   gAllp->SetMaximum(100.0);
-   gAllp->SetMinimum(2e-3);
-   gAllp->GetXaxis()->SetTitleOffset(1.);
-   gAllp->GetYaxis()->SetTitleOffset(1.);
+   gAllp->GetXaxis()->SetLimits(Ctau[0], 1200);//Ctau[NumModels-1] ) ;
+   gAllp->SetMaximum(15);
+   gAllp->SetMinimum(2e-3);  // for 100 TeV
+   //gAllp->SetMaximum(6.0);
+   //gAllp->SetMinimum(1e-3);   // 1e-6 for 180, 160
+   gAllp->GetXaxis()->SetTitleOffset(1.10);
+   gAllp->GetYaxis()->SetTitleOffset(1.10);
    gAllp->GetXaxis()->SetTitleFont(42);
    gAllp->GetYaxis()->SetTitleFont(42);
    gAllp->GetXaxis()->SetTitleSize(0.05);
    gAllp->GetYaxis()->SetTitleSize(0.07);
-   gAllp->GetXaxis()->SetTitle("Neutralino Proper Decay Length[mm]"); //c#tau_{#chi^{0}_{1}}[mm]" ) ;
+   //gAllp->GetXaxis()->SetTitle("Neutralino Proper Decay Length[mm]"); //c#tau_{#chi^{0}_{1}}[mm]" ) ;
+   gAllp->GetXaxis()->SetTitle("Neutralino Proper Decay Length[cm]"); //#tau(#tilde{#chi}^{0}_{1})[ns]" ) ;
    //gAllp->GetYaxis()->SetTitle("#sigma_{UL} (pb) @ 95% CL_{s}") ;
-   gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chi^{0}_{1}} #rightarrow #tilde{G}#gamma) #times BR [pb]");
-
+   gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chii}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [pb]");
+   //gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chi}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [fb]");
    // expected
    TGraph* gMExp = new TGraph(NumModels, Ctau, MedianExp ) ;
    gMExp->SetLineColor(kRed) ;
-   gMExp->SetLineWidth(3) ;
+   gMExp->SetLineWidth(4) ;
    gMExp->SetLineStyle(7) ;
    //gMExp->GetXaxis()->SetLimits(1.,5.) ;
 
-   gMExp->Draw("LPsame") ;
+   gMExp->Draw("Lsame") ;
    // observation
    TGraph* gObs = new TGraph(NumModels, Ctau, Observed ) ;
    gObs->SetLineColor(kBlack) ;
-   gObs->SetLineWidth(2) ;
+   gObs->SetLineWidth(4) ;
    gObs->SetLineStyle(1) ;
    //gObs->GetXaxis()->SetLimits(1.,5.) ;
    //gObs->SetMarkerStyle(20) ;
-  gObs->Draw("LPsame");
+   gObs->Draw("Lsame");
 
 
    std::string s_lumi;
@@ -362,37 +365,49 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    // theoretical suggestion
    TGraph* gth = new TGraph(NumModels, Ctau, sigXsec ) ;
    gth->SetLineColor(kBlue) ;
-   gth->SetLineWidth(3) ;
+   gth->SetLineWidth(5) ;
    gth->SetLineStyle(1) ;
-   gth->GetXaxis()->SetLimits( Ctau[0],6500);// Ctau[NumModels-1] ) ;
+   gth->SetFillStyle(3004);
+   gth->SetFillColor(kBlue);
+   gth->GetXaxis()->SetLimits( Ctau[0], 1200); //10500);// Ctau[NumModels-1] ) ;
    
    // Draw Graphs
    gth->Draw("Csame") ;
    // Legend
-   std::string Tctau ="6000";
-   TLegend* leg1 = new TLegend(.37, .57, .95, .85 );
-   leg1->SetHeader("#tilde{#chi}^{0}_{1} #rightarrow #gamma #tilde{G}"); // m_{#tilde{#chi}^{0}_{1}}= 256 GeV");
+   std::string Tctau ="12000";
+   std::string ReadLambda = "#tilde{#chi}^{0}_{1} #rightarrow #gamma #tilde{G},  #Lambda =" + LambdaValue + " TeV";
+   char* Lname = new char[ReadLambda.length() + 1]; // convert string to char
+   TLegend* leg1 = new TLegend(.45, .65, .95, .92 );
+   // leg1->SetHeader("#tilde{#chi}^{0}_{1} #rightarrow #gamma #tilde{G},  #Lambda =160 TeV"); // M_{#tilde{#chi}^{0}_{1}}= 256 GeV/c^{2}");
+  // leg->SetHeader(("c#tau(#tilde{#chi}^{0}_{1})  = "+ctau+" mm").c_str());
+   //leg1->SetHeader( Lname.c_str() ); // M_{#tilde{#chi}^{0}_{1}}= 256 GeV/c^{2}");
+   leg1->SetHeader( (ReadLambda).c_str() ); // M_{#tilde{#chi}^{0}_{1}}= 256 GeV/c^{2}");
    leg1->SetFillStyle(0); 
    leg1->SetBorderSize(0);
    leg1->SetFillColor(0);
    leg1 ->SetTextFont(22);
   // leg1->SetFillColor(10) ;
    //leg1->SetTextSize(0.030) ;
-   leg1->AddEntry( gth, "Theory LO cross-section" , "L");
+   leg1->AddEntry( gth, "SPS8 Theory LO Cross-Section" , "Lef");
    leg1->AddEntry( gMExp,"Expected 95% CL Upper Limit", "L");
    leg1->AddEntry( gObs, "Observed  95% CL Upper Limit", "L");
    leg1->AddEntry( g1sig, "#pm 1#sigma Expected" , "F");
    leg1->AddEntry( g2sig, "#pm 2#sigma Expected" , "F");
    leg1->Draw("same") ;
    
+
    c1a->RedrawAxis();
    c1a->GetFrame()->Draw();
+   c1a->SetLogx(1);
+   c1a->SetLogy(1);
+
    TString gPlotname = LambdaValue+"TeV_Neutralino_CrossSecTimesBR_Uplimit" ; 
    //TString gPlotname = "XsecTimesBR_Uplimit.pdf";
    c1a->Print( gPlotname+ ".pdf",".pdf") ;
    c1a->Print( gPlotname+ ".png",".png") ;
    c1a->Print( gPlotname+ ".eps",".eps") ;
    c1a->Draw();
+   delete[] Lname;
 }
 
 //***********************************************************************///
@@ -499,16 +514,17 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    //Onesig_graph->Draw("FE3same");
    //Twosig_graph->Draw("FE3same");
    gAllp->Draw("E3F same");
-   gAllp->GetYaxis()->SetRangeUser(1e-3, 20.);
+   gAllp->GetYaxis()->SetRangeUser(1e-3, 6.);
    //gAllp->GetXaxis()->SetRangeUser(50., 200);
    gAllp->GetXaxis()->SetRangeUser(100., 500.);
-   //gAllp->GetXaxis()->SetTitle("Neutralino Mass [GeV/c^{2}]");
+   gAllp->GetXaxis()->SetTitle("Neutralino Mass [GeV/c^{2}]");
   // gAllp->GetXaxis()->SetTitle("#Lambda [TeV]");
-   gAllp->GetXaxis()->SetTitle("M_{#tilde{#chi}^{0}_{1}} [GeV/c^{2}]");
+   //gAllp->GetXaxis()->SetTitle("M_{#tilde{#chi}^{0}_{1}} [GeV/c^{2}]");
    gAllp->GetYaxis()->SetTitle("#sigma ( #tilde{#chi}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [pb]");
   
    // TGaxis* axis = new TGaxis( xmin, yposition, xmax, yposition, xlabelmin, xlabelmax,nbins, "Option")
-   TGaxis *lambdaAxis = new TGaxis(140,2.7e-3,255,2.7e-3,100, 180, 4,"+L");
+   //TGaxis *lambdaAxis = new TGaxis(140,4.7e-4,430,4.7e-4,100, 300, 4,"+L");
+   TGaxis *lambdaAxis = new TGaxis(140,4.7e-3,255,4.7e-3,100, 180, 4,"+L");
    lambdaAxis->SetTitle("#Lambda [TeV]");
    lambdaAxis->SetLabelSize(0.04);
    lambdaAxis->SetTitleSize(0.04);
@@ -523,7 +539,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    exp_lim_graph->SetLineWidth(3);
    exp_lim_graph->SetLineColor(kRed);
    exp_lim_graph->SetLineStyle(7);
-   exp_lim_graph->Draw("LPsame");
+   exp_lim_graph->Draw("Lsame");
 
    // Observed Limits
    TGraph* ul_lim_graph;
@@ -531,7 +547,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    ul_lim_graph  = new TGraph(nMod, Mass, obs_lim);
    ul_lim_graph->SetLineColor(kBlack);
    ul_lim_graph->SetLineWidth(3);
-   ul_lim_graph->Draw("LPsame");
+   ul_lim_graph->Draw("Lsame");
   
    // Do Exclusion Limits/CDF
  /*  float x_shaded[8] = {130,135,140,146,146,140,135,130 };
@@ -545,7 +561,8 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    std::string s_lumi;
    std::string CoMEr;
    s_lumi = "19.1";
-   CoMEr = "#sqrt{(S)} = 8 TeV";
+   CoMEr = "(8 TeV)";
+   //CoMEr = "#sqrt{(S)} = 8 TeV";
    //std::string lint = "#int Ldt= "+s_lumi+" fb^{-1}";
    std::string lint = s_lumi + "fb^{-1}"+ CoMEr;
    TLatex lg;
@@ -565,11 +582,13 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    // Theoretical Cross Section 
    //TGraph *xsTh_vs_m = new TGraph(nMod, Lambda, xsTh);
    TGraph *xsTh_vs_m = new TGraph(nMod, Mass, xsTh);
-   xsTh_vs_m->SetLineWidth(4);
+   xsTh_vs_m->SetLineWidth(5);
    xsTh_vs_m->SetLineColor(kBlue);
    xsTh_vs_m->SetMarkerSize(1.);
    xsTh_vs_m->SetMarkerStyle(22);
-   xsTh_vs_m->SetMarkerColor(kRed);
+   xsTh_vs_m->SetFillStyle(3004);
+   xsTh_vs_m->SetFillColor(kBlue);
+   // xsTh_vs_m->SetMarkerColor(kRed);
    //xsTh_vs_m->SetTitle("Neutralino Mass [GeV/c^{2}]");
    //xsTh_vs_m->GetXaxis()->SetTitle("#Lambda [TeV]");
    xsTh_vs_m->SetTitle("M_{#tilde{#chi^{0}_{1}}} [GeV/c^{2}]");
@@ -577,7 +596,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    xsTh_vs_m->SetTitle("#sigma (pb) ");
    xsTh_vs_m->Draw("Csame");
    // Legend
-   TLegend* leg = new TLegend(0.47,0.55,0.91,0.93);
+   TLegend* leg = new TLegend(0.50,0.60,0.91,0.93);
    leg->SetFillStyle(0); leg->SetBorderSize(0); 
    leg->SetFillColor(0);
    leg->SetHeader(("c#tau(#tilde{#chi}^{0}_{1})  = "+ctau+" mm").c_str());
@@ -586,16 +605,16 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    
    //leg->AddEntry(TEVATlim,"CDF exclusion (2.6 fb^{-1})","f");
    
-   leg->AddEntry(xsTh_vs_m,"Theoretical LO cross-section","l");
+   leg->AddEntry(xsTh_vs_m,"SPS8 Theory LO Cross-Section","lef");
    leg->AddEntry(ul_lim_graph, "Observed  95% CL upper limit", "L");
    leg->AddEntry(exp_lim_graph, "Expected 95% CL upper limit", "L");
    leg->AddEntry(Onesig_graph, "#pm 1 #sigma Expected", "F");
    leg->AddEntry(Twosig_graph, "#pm 2 #sigma Expected", "F");
    leg->Draw("same");
    //c0->SaveAs(("exclusion_limit_"+ctau+".eps").c_str());
-   c0->SaveAs(( "Neutralino_CrossSecVsMAss_Exclusion_limit_"+ctau+".png").c_str());
-   //c0->SaveAs(("TeV_Neutralino_CrosSecVsMass_Exclusion_limit_"+ctau+".pdf").c_str());
-   //c0->SaveAs(("Neutralino_CrossSecVsMass_Exclusion_limit_"+ctau+".eps").c_str());
+   c0->SaveAs(( "Neutralino_CrossSecVsMass_Exclusion_limit_"+ctau+".png").c_str());
+   c0->SaveAs(("Neutralino_CrosSecVsMass_Exclusion_limit_"+ctau+".pdf").c_str());
+   c0->SaveAs(("Neutralino_CrossSecVsMass_Exclusion_limit_"+ctau+".eps").c_str());
 }
 
 //Use cms style
@@ -767,7 +786,8 @@ void MassVsCtau_exclusion(){
  //************** Observed 8 TeV Limits ********************************//
   //Double_t obs_lim_cms_8TeV[17] = {101., 150., 160., 180., 212., 231., 246., 246., 246., 246., 231., 212., 193., 180., 160., 150., 101. }; // Mass Limmits
   Double_t obs_lim_cms_8TeV[10] = {140., 169., 198., 227., 255., 255., 227., 198., 169., 140.};//, 314., 314., 372., 372., 430., 430.}; // Mass Limmits
-  Double_t ctau_8TeV[10] ={8000., 8200., 8400., 8500., 8500., 690., 400., 350., 300.,400.}; //, 250., 500., 1000., 2000.,3000., 4000., 6000., 12000.};
+  //Double_t ctau_8TeV[10] ={1090.0, 1090.0, 1090.0, 1050.0, 850.0, 69.0, 50., 50., 55.0, 69.0 }; //, 250., 500., 1000., 2000.,3000., 4000., 6000., 12000.};
+  Double_t ctau_8TeV[10] ={1200.0, 1200.0, 1350.0, 1050.0, 795.0, 72.0, 48.0, 51.0, 49.50, 57.0 }; //, 250., 500., 1000., 2000.,3000., 4000., 6000., 12000.};
   
   TGraph* obs_cms_gr = new TGraph(10, obs_lim_cms_8TeV,ctau_8TeV);
   obs_cms_gr->SetFillColor(kCyan);
@@ -777,8 +797,10 @@ void MassVsCtau_exclusion(){
 
 //************** expected 8 TeV Limits ********************************//
  Double_t exp_lim_cms_8TeV[10] = {140., 169., 198., 227., 255., 255., 227., 198., 169., 140.}; //, 314., 314., 372., 372., 430., 430. };  // Mass Limits
+  //Double_t exp_ctau_8TeV[10] ={1090.0, 1090.0, 1090.0, 1050.0, 850.0, 69.0, 50., 50., 55.0, 69.0 }; //, 250., 500., 1000., 2000.,3000., 4000., 6000., 12000.};
+  Double_t exp_ctau_8TeV[10] ={1800.0, 1800.0, 1650.0, 1260.0, 1140.0, 55.5, 40.50, 45.0, 37.50, 42.0 }; //, 250., 500., 1000., 2000.,3000., 4000., 6000., 12000.};
 
-  TGraph* exp_cms_gr = new TGraph(10, exp_lim_cms_8TeV, ctau_8TeV);
+  TGraph* exp_cms_gr = new TGraph(10, exp_lim_cms_8TeV, exp_ctau_8TeV);
   exp_cms_gr->SetFillColor(kRed-4);
   exp_cms_gr->SetLineColor(kRed-4);
   exp_cms_gr->SetLineWidth(4);
@@ -787,7 +809,7 @@ void MassVsCtau_exclusion(){
   //**************************observed cms 7 TeV *******************************//
   Double_t obs_lim_cms[16]={100., 145., 157., 179., 192., 216., 221., 218., 218., 221., 216., 192., 179., 157., 145., 100.}; // Observed Limit in Mass
 
-  Double_t ctau[16]={0., 0., 0., 0., 0., 0., 0., 0., 1., 250., 500., 1000., 2000., 4000., 6000., 6000.}; // Observed Limit in CTAU
+  Double_t ctau[16]={0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10., 25.0, 50.0, 100.0, 200.0, 400.0, 600.0, 600.0}; // Observed Limit in CTAU
 
   TGraph* obs_exclusion_cms;
   obs_exclusion_cms = new TGraph(16, obs_lim_cms,ctau);
@@ -809,7 +831,7 @@ void MassVsCtau_exclusion(){
 
 //**************************observed cdf*******************************//
   Double_t obs_lim_cdf[6]={100., 146., 149.5, 149.5, 146., 100.};
-  Double_t lifetime_cdf[6]={0., 0., 0., 300., 600., 600.};
+  Double_t lifetime_cdf[6]={0.0, 0.0, 0.0, 30.0, 60.0, 60.0};
 
 
   TGraph* obs_exclusion_cdf;
@@ -821,7 +843,7 @@ void MassVsCtau_exclusion(){
 
 //**************************observed D0*******************************//
   Double_t obs_lim_d0[4]={100., 175., 175., 100.};
-  Double_t lifetime_d0[4]={0., 0., 0.9, 0.9};
+  Double_t lifetime_d0[4]={0.0, 0.0, 9.0, 9.0};
 
  
 
@@ -836,7 +858,7 @@ void MassVsCtau_exclusion(){
 
 //**************************observed conversion*******************************//
   Double_t obs_lim_conv[4]={100., 140., 140., 100.};
-  Double_t lifetime_conv[4]={0., 0., 30., 30.};
+  Double_t lifetime_conv[4]={0.0, 0.0, 3.0, 3.0};
 
  
 
@@ -872,15 +894,17 @@ void MassVsCtau_exclusion(){
     pad1->Draw();
     pad1->cd();
     
-    TH2F *h2 = new TH2F("h","Axes",100,100,255,100,0.7,1E8);
+    //TH2F *h2 = new TH2F("h","Axes",100,100,255,100,0.7,1E8);
+    TH2F *h2 = new TH2F("h","Axes",100,100,260,100,0.7,1E5);
     //h2->GetXaxis()->SetTitle("M_{#tilde{#chi^{0}_{1}}} [GeV/c^{2}]");
     //h2->GetYaxis()->SetTitle("c#tau_{#tilde{#chi^{0}_{1}}} [mm]");
     h2->GetXaxis()->SetTitle("Neutralino Mass [GeV/c^{2}]");
-    h2->GetYaxis()->SetTitle("Neutralino Proper Decay Length [mm]");
+    h2->GetYaxis()->SetTitle("Neutralino Proper Decay Length [cm]");
     h2->GetXaxis()->SetTitleSize(0.048);
     h2->GetXaxis()->SetTitleOffset(1.24);
 
     h2->GetXaxis()->SetRangeUser(100., 260.);
+    //h2->GetYaxis()->SetRangeUser(0., 10000.);
     h2->GetYaxis()->SetTitleSize(0.048);
     h2->GetYaxis()->SetTitleOffset(1.6);
     h2->Draw("");
@@ -889,17 +913,17 @@ void MassVsCtau_exclusion(){
     obs_exclusion_cms->Draw("LF");
     obs_exclusion_cdf->Draw("LFsame");
     obs_exclusion_conv->Draw("LFsame");
-    obs_exclusion_d0->Draw("LFsame");
+    //obs_exclusion_d0->Draw("LFsame");
     obs_cms_gr->Draw("Fsames");
     exp_exclusion_cms->Draw("Lsame");
     exp_cms_gr->Draw("Lsame");
     h2->Draw("sameaxis");
 
-    TGaxis *lAxis = new TGaxis(140,6.0,255,6.0,100, 180, 4,"+L");
+    TGaxis *lAxis = new TGaxis(140,2.8,255,2.8,100, 180, 4,"+L");
     lAxis->SetTitle("SUSY #Lambda [TeV]");
     lAxis->SetLabelSize(0.04);
     lAxis->SetTitleSize(0.04);
-    lAxis->SetTitleOffset(1.15);
+    lAxis->SetTitleOffset(1.2);
     lAxis->Draw("sames");
 
    // Labelling SPS8 mGMSB Model
@@ -917,7 +941,7 @@ void MassVsCtau_exclusion(){
    pt->AddText("#font[42]{M_{m} = 2#Lambda, tan(#beta)=15}");
    pt->AddText("#font[42]{N_{m} = 1, #mu > 0}");
 
-   TLegend* leg = new TLegend(0.24, 0.57, 0.90, 0.88);
+   TLegend* leg = new TLegend(0.50, 0.69, 0.85, 0.94);
    leg->SetFillStyle(0); leg->SetBorderSize(0); 
    leg->SetFillColor(0);
    leg->SetTextSize(0.030) ;
@@ -929,13 +953,17 @@ void MassVsCtau_exclusion(){
  
   // leg ->SetTextFont(22);
    leg ->SetTextFont(42);
-   leg->AddEntry(exp_cms_gr, "CMS Expected with #gamma + Jets 19.1 fb^{-1}(8 TeV)", "l");
-   leg->AddEntry(obs_cms_gr, "CMS Observed with #gamma + Jets 19.1 fb^{-1}(8 TeV)", "f");
-   leg->AddEntry(exp_exclusion_cms, "CMS expected with #gamma + Jets (4.86 fb^{-1})(7 TeV)", "l");
-   leg->AddEntry(obs_exclusion_cms, "CMS observed with #gamma + Jets (4.86 fb^{-1})(7 TeV)", "f");
-   leg->AddEntry(obs_exclusion_conv,"CMS with #gamma (conversions) + #slash{E}_{T} + Jets (2.1 fb^{-1})","f");
-   leg->AddEntry(obs_exclusion_cdf,"CDF with #gamma #gamma + #slash{E}_{T} + Jets (2.6 fb^{-1})","f"); 
-   leg->AddEntry(obs_exclusion_d0,"D#slash{O} with prompt #gamma #gamma + #slash{E}_{T} (6.3 fb^{-1})","f");
+   //leg->AddEntry(exp_cms_gr, "CMS Expected with #gamma + Jets 19.1 fb^{-1}(8 TeV)", "l");
+   //leg->AddEntry(obs_cms_gr, "CMS Observed with #gamma + Jets 19.1 fb^{-1}(8 TeV)", "f");
+   leg->AddEntry(exp_cms_gr, "CMS Exp  19.1 fb^{-1}(8 TeV)", "l");
+   leg->AddEntry(obs_cms_gr, "CMS Obs  19.1 fb^{-1}(8 TeV)", "f");
+   leg->AddEntry(exp_exclusion_cms, "CMS Exp  (4.86 fb^{-1})(7 TeV)", "l");
+   leg->AddEntry(obs_exclusion_cms, "CMS Obs  (4.86 fb^{-1})(7 TeV)", "f");
+   //leg->AddEntry(obs_exclusion_conv,"CMS (conversions) + #slash{E}_{T} + Jets (2.1 fb^{-1})","f");
+   //leg->AddEntry(obs_exclusion_cdf,"CDF  #gamma #gamma + #slash{E}_{T} + Jets (2.6 fb^{-1})","f"); 
+   leg->AddEntry(obs_exclusion_conv,"CMS (conversions)(2.1 fb^{-1})","f");
+   leg->AddEntry(obs_exclusion_cdf,"CDF  (2.6 fb^{-1})","f"); 
+  // leg->AddEntry(obs_exclusion_d0,"D#slash{O} with prompt #gamma #gamma + #slash{E}_{T} (6.3 fb^{-1})","f");
   
    leg->Draw("same");
 
