@@ -308,7 +308,7 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    //gAllp->GetXaxis()->SetTitle("Neutralino Proper Decay Length[mm]"); //c#tau_{#chi^{0}_{1}}[mm]" ) ;
    gAllp->GetXaxis()->SetTitle("Neutralino Proper Decay Length[cm]"); //#tau(#tilde{#chi}^{0}_{1})[ns]" ) ;
    //gAllp->GetYaxis()->SetTitle("#sigma_{UL} (pb) @ 95% CL_{s}") ;
-   gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chii}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [pb]");
+   gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chi}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [pb]");
    //gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chi}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [fb]");
    // expected
    TGraph* gMExp = new TGraph(NumModels, Ctau, MedianExp ) ;
