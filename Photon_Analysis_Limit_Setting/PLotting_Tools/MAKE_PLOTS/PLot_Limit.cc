@@ -185,7 +185,13 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    float sigXsec[NumModels];
    float Ctau[NumModels];
    float Lambda[NumModels];
-   float CtauError[NumModels] ;
+   float CtauError[NumModels];
+
+    // +/-1, 2 sigmas
+   float lo68l[NumModels];
+   float hi68l[NumModels];
+   float lo95l[NumModels];
+   float hi95l[NumModels];
    
 /*   //Method 1 to Read File
    std::ifstream fitlog(fileName, ios::in);
@@ -230,9 +236,9 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    // Method 2 : read file old way!
    FILE* fitlog = fopen(fileName.c_str(),"r+");
    int read ;
-   float  Obs_limit, TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp, eff, sgXsec, ctau, lambda, Bratio, lumi;
+   float  Obs_limit, TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp, eff, sgXsec, ctau, lambda, Br, lumi;
    //float ep;
-   for ( int i=0; i< NumModels ; i++ ) {
+   for ( int i=0; i < NumModels ; i++ ) {
 
        read = fscanf(fitlog, "%f", &Obs_limit );
        read = fscanf(fitlog, "%f", &OneSigD );  // Reading From file is two sig Down
@@ -244,32 +250,38 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
        read = fscanf(fitlog, "%f", &sgXsec);
        read = fscanf(fitlog, "%f", &ctau);
        read = fscanf(fitlog, "%f", &lambda);
-       read = fscanf(fitlog, "%f", &Bratio);
+       read = fscanf(fitlog, "%f", &Br);
        read = fscanf(fitlog, "%f", &lumi);
        //read = fscanf(fitlog, "%f", &ep );
        
        CtauError[i] = 0. ;
        Ctau[i] = ctau/10; //length in cm //ctauModel[i] ; mm to ns conversion /300mm/ns
        Lambda[i] = lambda; //lambdaModel[i] ;
-       Up2sigma[i] = TwoSigUp*sgXsec/eff; //(eff*lumi) ; pb to fb conversion
-       Up1sigma[i] = OneSigUp*sgXsec/eff; //(eff*lumi) ;
-       MedianExp[i] =mexp*sgXsec/eff; //(eff*lumi) ;
-       Down2sigma[i] =TwoSigD*sgXsec/eff; //(eff*lumi) ;
-       Down1sigma[i] =OneSigD*sgXsec/eff; //(eff*lumi) ;
-       Observed[i] = Obs_limit*sgXsec/eff; //(eff*lumi) ;
+       Up2sigma[i] = TwoSigUp*sgXsec*Br/eff; //(eff*lumi) ; pb to fb conversion
+       Up1sigma[i] = OneSigUp*sgXsec*Br/eff; //(eff*lumi) ;
+       MedianExp[i] = mexp*sgXsec*Br/eff; //(eff*lumi) ;
+       Down2sigma[i] = TwoSigD*sgXsec*Br/eff; //(eff*lumi) ;
+       Down1sigma[i] = OneSigD*sgXsec*Br/eff; //(eff*lumi) ;
+       Observed[i] = Obs_limit*sgXsec*Br/eff; //(eff*lumi) ;
        //aep[i] = ep / (eff*lumi) ;
-       sigXsec[i] = sgXsec ;    // pb to fb conversion
+       sigXsec[i] = sgXsec*Br;    // pb to fb conversion
+        // sigma bands
+       lo68l[i] = fabs( (OneSigD - mexp)*sgXsec*Br );
+       hi68l[i] = fabs( (OneSigUp - mexp)*sgXsec*Br );
+       lo95l[i] = fabs( (TwoSigD - mexp)*sgXsec*Br );
+       hi95l[i] = fabs((TwoSigUp - mexp)*sgXsec*Br  );
+       
        //printf(" mexp: %f, eff: %f , MedianExp: %f \n", mexp, eff, MedianExp[i] ) ;
        //printf(" %f, %f, %f, %f, %f \n", TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp ) ;
-       if ( read != 1 ) cout<<" reading error "<<endl ;
+      if ( read != 1 ) cout<<" reading error "<<endl ;
    }
   
 
    //TCanvas *c1a = new TCanvas("c1a","c1a",200,10,600,400);
    TCanvas *c1a = new TCanvas("c1a","c1a",200,100,900,900);
    c1a->SetLogy() ;
-
-   TGraphAsymmErrors* g2sig = new TGraphAsymmErrors(NumModels, Ctau, MedianExp, CtauError, CtauError, Down2sigma, Up2sigma);
+                                                    // ArrSize, X, Y, xerl, xerh, yerl, yerh 
+   TGraphAsymmErrors* g2sig = new TGraphAsymmErrors(NumModels, Ctau, MedianExp, CtauError, CtauError, lo95l, hi95l);
    g2sig->SetFillStyle(1001);
    //g2sig->SetFillColor(kSpring);
    g2sig->SetFillColor(kYellow);
@@ -277,7 +289,7 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    //g2sig->GetXaxis()->SetRangeUser(1.,5.) ;
    //g2sig->GetXaxis()->SetLimits(1.,5.) ;
    
-   TGraphAsymmErrors* g1sig = new TGraphAsymmErrors(NumModels, Ctau, MedianExp, CtauError, CtauError, Down1sigma, Up1sigma);
+   TGraphAsymmErrors* g1sig = new TGraphAsymmErrors(NumModels, Ctau, MedianExp, CtauError, CtauError, lo68l, hi68l);
    g1sig->SetFillStyle(1001);
    g1sig->SetFillColor(kGreen);
    g1sig->SetLineColor(kGreen) ;
@@ -295,9 +307,9 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
   // gAllp->GetXaxis()->SetLimits( Ctau[0], Ctau[NumModels-1] ) ;
    //gAllp->GetXaxis()->SetLimits( Ctau[0], 6500);//Ctau[NumModels-1] ) ;
    gAllp->GetXaxis()->SetLimits(Ctau[0], 1200);//Ctau[NumModels-1] ) ;
-   gAllp->SetMaximum(15);
-   gAllp->SetMinimum(2e-3);  // for 100 TeV
-   //gAllp->SetMaximum(6.0);
+   gAllp->SetMaximum(10);
+   gAllp->SetMinimum(5e-2);  // for 100 TeV
+   //gAllp->SetMaximum(1.0);
    //gAllp->SetMinimum(1e-3);   // 1e-6 for 180, 160
    gAllp->GetXaxis()->SetTitleOffset(1.10);
    gAllp->GetYaxis()->SetTitleOffset(1.10);
@@ -441,8 +453,12 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
         //float xsTh[nMod] = { 0.2357, 0.0860, 0.0368, 0.0181, 0.0092 };  //Production Cross section @ 7TeV Lambda 100 - 180 TeV
         FILE* fileIn = fopen(fName.c_str(),"r+");
         int read ;
-        float  Obs_limit, TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp, eff, sgXsec, c_tau, lambda, mass, lumi;
+        float  Obs_limit, TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp, eff, sgXsec, c_tau, lambda, mass, BR, lumi;
         
+        float lo68lim[nMod];
+        float hi68lim[nMod];
+        float lo95lim[nMod];
+        float hi95lim[nMod];
 	// Looop file and get limits
       for ( int i=0; i< nMod ; i++ ) {
        read = fscanf(fileIn, "%f", &Obs_limit );
@@ -456,27 +472,36 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
        read = fscanf(fileIn, "%f", &c_tau);
        read = fscanf(fileIn, "%f", &lambda);
        read = fscanf(fileIn, "%f", &mass);
+       read = fscanf(fileIn, "%f", &BR);
        read = fscanf(fileIn, "%f", &lumi);
         
        LambdaEr[i] = 0.;
        MassEr[i] = 0. ;
        //Xsec[i] = sgXsec ;
-       xsTh[i] = sgXsec ;
-       mXsTh[i] = sgXsec*theoFac;
+       xsTh[i] = sgXsec*BR ;
+       mXsTh[i] = sgXsec*theoFac*BR;
        Ctau[i] = c_tau;
        lum[i] = lumi;
        Mass[i] = mass;
        Lambda[i] = lambda; //ctauModel[i] ;
-       exp_up_2sig[i] = TwoSigUp*sgXsec/eff; //(eff*lumi) ;
-       exp_up_1sig[i] = OneSigUp*sgXsec/eff; //(eff*lumi) ;
-       exp_lim[i] =mexp*sgXsec/eff; //(eff*lumi) ;
-       exp_down_2sig[i] =TwoSigD*sgXsec/eff; //(eff*lumi) ;
-       exp_down_1sig[i] =OneSigD*sgXsec/eff; //(eff*lumi) ;
-       obs_lim[i] = Obs_limit*sgXsec/eff; //(eff*lumi) ;
+       exp_up_2sig[i] = TwoSigUp*sgXsec*BR/eff; //(eff*lumi) ;
+       exp_up_1sig[i] = OneSigUp*sgXsec*BR/eff; //(eff*lumi) ;
+       exp_lim[i] = mexp*sgXsec*BR/eff; //(eff*lumi) ;
+       exp_down_2sig[i] = TwoSigD*sgXsec*BR/eff; //(eff*lumi) ;
+       exp_down_1sig[i] = OneSigD*sgXsec*BR/eff; //(eff*lumi) ;
+       obs_lim[i] = Obs_limit*sgXsec*BR/eff; //(eff*lumi) ;
        //aep[i] = ep / (eff*lumi) ;
+       
+       // sigma bands
+       lo68lim[i] = fabs( (OneSigD - mexp)*sgXsec*BR );
+       hi68lim[i] = fabs( (OneSigUp - mexp)*sgXsec*BR );
+       lo95lim[i] = fabs( (TwoSigD - mexp)*sgXsec*BR );
+       hi95lim[i] = fabs((TwoSigUp - mexp)*sgXsec*BR  );
        //printf(" mexp: %f, eff: %f , MedianExp: %f \n", mexp, eff, MedianExp[i] ) ;
        //printf(" %f, %f, %f, %f, %f \n", TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp ) ;
        if ( read != 1 ) cout<<" reading error "<<endl ;
+
+       
    }
 
 
@@ -491,7 +516,10 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
     // One Sigma Error band
    
    //TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Lambda, exp_lim, LambdaEr, LambdaEr, exp_down_1sig, exp_up_1sig);
-   TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, exp_down_1sig, exp_up_1sig);
+   //TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, exp_down_1sig, exp_up_1sig);
+
+   //TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Lambda, exp_lim, LambdaEr, LambdaEr, lo68lim, hi68lim);
+   TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, lo68lim, hi68lim);
    //onesig_graph->GetXaxis()->SetRangeUser(1.,5.) ;
    //onesig_graph->GetXaxis()->SetLimits(1.,5.) ;
    Onesig_graph->SetFillStyle(1001);
@@ -499,7 +527,10 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    Onesig_graph->SetLineColor(kGreen);
 
    //TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Lambda, exp_lim, LambdaEr, LambdaEr, exp_down_2sig, exp_up_2sig);
-   TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, exp_down_2sig, exp_up_2sig);
+   // TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, exp_down_2sig, exp_up_2sig);
+   
+   //TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Lambda, exp_lim, LambdaEr, LambdaEr, lo95lim, hi95lim);
+   TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, lo95lim, hi95lim);
    //Twosig_graph->GetXaxis()->SetRangeUser(1.,5.) ;
    //Twosig_graph->GetXaxis()->SetLimits(1.,5.) ;
    Twosig_graph->SetFillStyle(1001);
@@ -536,7 +567,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    TGraph* exp_lim_graph;
    //exp_lim_graph  = new TGraph(nMod, Lambda, exp_lim);
    exp_lim_graph  = new TGraph(nMod, Mass, exp_lim);
-   exp_lim_graph->SetLineWidth(3);
+   exp_lim_graph->SetLineWidth(5);
    exp_lim_graph->SetLineColor(kRed);
    exp_lim_graph->SetLineStyle(7);
    exp_lim_graph->Draw("Lsame");
@@ -546,7 +577,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    //ul_lim_graph  = new TGraph(nMod, Lambda, obs_lim);
    ul_lim_graph  = new TGraph(nMod, Mass, obs_lim);
    ul_lim_graph->SetLineColor(kBlack);
-   ul_lim_graph->SetLineWidth(3);
+   ul_lim_graph->SetLineWidth(5);
    ul_lim_graph->Draw("Lsame");
   
    // Do Exclusion Limits/CDF
