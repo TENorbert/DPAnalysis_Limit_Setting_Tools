@@ -307,12 +307,13 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
   // gAllp->GetXaxis()->SetLimits( Ctau[0], Ctau[NumModels-1] ) ;
    //gAllp->GetXaxis()->SetLimits( Ctau[0], 6500);//Ctau[NumModels-1] ) ;
    gAllp->GetXaxis()->SetLimits(Ctau[0], 1200);//Ctau[NumModels-1] ) ;
-   gAllp->SetMaximum(10);
-   gAllp->SetMinimum(5e-2);  // for 100 TeV
+   //gAllp->SetMaximum(10);
+   ///gAllp->SetMinimum(5e-2);  // for 100 TeV
    //gAllp->SetMaximum(1.0);
-   //gAllp->SetMinimum(1e-3);   // 1e-6 for 180, 160
+   gAllp->SetMaximum(4e-1);
+   gAllp->SetMinimum(3e-3);   // 1e-6 for 180, 160
    gAllp->GetXaxis()->SetTitleOffset(1.10);
-   gAllp->GetYaxis()->SetTitleOffset(1.10);
+   gAllp->GetYaxis()->SetTitleOffset(1.02);
    gAllp->GetXaxis()->SetTitleFont(42);
    gAllp->GetYaxis()->SetTitleFont(42);
    gAllp->GetXaxis()->SetTitleSize(0.05);
