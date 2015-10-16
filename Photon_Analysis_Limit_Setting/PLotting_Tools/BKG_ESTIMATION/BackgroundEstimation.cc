@@ -447,35 +447,67 @@ TF1* GetFxnFromFitPams( TH1F* fithist, TF1 *ffxn, TF1* fxnfff )
 //
 TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf ) 
   {
-    Double_t intimeNum, tailNumL, tailNumR, Ratio ;
-    Double_t intimeNumB4, tailNumLB4, tailNumRB4, RatioB4 ;
+    Double_t SigintimeNumB4, SigtailNumLB4, SigtailNumRB4, SigRatioB4 ;
+    Double_t FSigintimeNum, FSigtailNumL, FSigtailNumR, FSigRatio ;
+    Double_t BkgintimeNumB4, BkgtailNumLB4, BkgtailNumRB4, BkgRatioB4 ;
+    Double_t BkgintimeNum, BkgtailNumL, BkgtailNumR, BkgRatio ;
 
     TH1F *hs = (TH1F*)hstime->Clone();
     hs->SetName("ExpectedSignalTime");
     printf("#####################################################\n");
     std::cout <<" TOTAL BACKGROUND EVENTS BEFORE SCALING... =  " << hbtime->Integral(lowt, hit) << std::endl;
+    BkgtailNumLB4 = hbtime->Integral(lowt, binTL ); //  t < -3ns
+    BkgtailNumRB4 = hbtime->Integral(binTU, hit);   //   t > 3ns 
+    BkgintimeNumB4 = hbtime->Integral(binWL , binWU); // -2 < t < 2
+    BkgRatioB4 = (BkgtailNumLB4 <= 0) ? ( BkgtailNumRB4/BkgintimeNumB4 ) : ( (BkgtailNumLB4 + BkgtailNumRB4)/BkgintimeNumB4 );
+    
+    printf("==============================================================================================\n"); 
+    std::cout << "==> BKG B4 SCALING: ELECTRON CANDIDATES WITHIN [-2, 2]ns =\t " <<  BkgintimeNumB4 << std::endl ; 
+    std::cout << "==> BKG B4 SCALING: ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  BkgtailNumLB4  << std::endl ; 
+    std::cout << "==> BKG B4 SCALING: ELECTRON CANDIDATES WITH   t > 3 ns =\t" << BkgtailNumRB4 << std::endl;  
+    std::cout << "==> BKG B4 SCALING: ELECTRON CANDIDATES WITH  |t| > 3 ns =\t" << BkgtailNumLB4 + BkgtailNumRB4 << std::endl; 
+    std::cout << "==> BKG B4 SCALING: RATIO OF ELECTRON CANDIDATES  WITH t > 3 ns / |t| < 2ns =\t" <<  BkgRatioB4 << std::endl ;
+    printf("==============================================================================================\n");
+
     printf("#####################################################\n");
-    tailNumLB4 = hstime->Integral(lowt, binTL ); //  t < -3ns
-    tailNumRB4 = hstime->Integral(binTU, hit);   //   t > 3ns 
-    intimeNumB4 = hstime->Integral(binWL , binWU); // -2 < t < 2
+     printf("### SIGNAL NUMBERS BEFORE SUBTRACTION ####\n");
+    printf("#####################################################\n");
+    
+    printf("==============================================================================================\n");
+    std::cout <<" TOTAL SIGNAL EVENTS BEFORE BKG SUBTRACTION... =  " << hstime->Integral(lowt, hit) << std::endl;
+    SigtailNumLB4 = hstime->Integral(lowt, binTL ); //  t < -3ns
+    SigtailNumRB4 = hstime->Integral(binTU, hit);   //   t > 3ns 
+    SigintimeNumB4 = hstime->Integral(binWL , binWU); // -2 < t < 2
    
     //RatioB4 = (intimeNumB4 == 0) ? (0) : ( (tailNumLB4 + tailNumRB4)/intimeNumB4 );
-    RatioB4 = (tailNumLB4 <= 0) ? ( tailNumRB4/intimeNumB4 ) : ( (tailNumLB4 + tailNumRB4)/intimeNumB4 );
+    SigRatioB4 = (SigtailNumLB4 <= 0) ? ( SigtailNumRB4/SigintimeNumB4 ) : ( (SigtailNumLB4 + SigtailNumRB4)/SigintimeNumB4 );
     
     printf("==============================================================================================\n");
-    
-    std::cout << "==> B4 SCALING: ELECTRON CANDIDATES WITHIN [-2, 2]ns =\t " <<  intimeNumB4 << std::endl ; 
-    std::cout << "==> B4 SCALING: ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  tailNumLB4  << std::endl ; 
-    std::cout << "==> B4 SCALING: ELECTRON CANDIDATES WITH   t > 3 ns =\t" << tailNumRB4 << std::endl;  
-    std::cout << "==> B4 SCALING: ELECTRON CANDIDATES WITH  |t| > 3 ns =\t" << tailNumLB4 + tailNumRB4 << std::endl; 
-    std::cout << "==> B4 SCALING: RATION OF ELECTRON CANDIDATES  WITH t > 3 ns / |t| < 2ns =\t" <<  RatioB4 << std::endl ;
-
+    std::cout << "==> SIGNAL B4 BKG SUBTRACTION: ELECTRON CANDIDATES WITHIN [-2, 2]ns =\t " <<  SigintimeNumB4 << std::endl ; 
+    std::cout << "==> SIGNAL B4 BKG SUBTRACTION: ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  SigtailNumLB4  << std::endl ; 
+    std::cout << "==> SIGNAL B4 BKG SUBTRACTION: ELECTRON CANDIDATES WITH   t > 3 ns =\t" << SigtailNumRB4 << std::endl;  
+    std::cout << "==> SIGNAL B4 BKG SUBTRACTION: ELECTRON CANDIDATES WITH  |t| > 3 ns =\t" << SigtailNumLB4 + SigtailNumRB4 << std::endl; 
+    std::cout << "==> SIGNAL B4 BKG SUBTRACTION: RATIO OF ELECTRON CANDIDATES  WITH t > 3 ns / |t| < 2ns =\t" <<  SigRatioB4 << std::endl ;
     printf("==============================================================================================\n");
 
 
-    // Now Scale
+    // Now Scale BKG
     hbtime->Scale(sf);
    
+    printf("***********#####################################################*****************************\n");
+    std::cout <<" TOTAL BACKGROUND EVENTS AFTER SCALING... =  " << hbtime->Integral(lowt, hit) << std::endl;
+    BkgtailNumL = hbtime->Integral(lowt, binTL ); //  t < -3ns
+    BkgtailNumR = hbtime->Integral(binTU, hit);   //   t > 3ns 
+    BkgintimeNum = hbtime->Integral(binWL , binWU); // -2 < t < 2
+    BkgRatio = (BkgtailNumL <= 0) ? ( BkgtailNumR/BkgintimeNum ) : ( (BkgtailNumL + BkgtailNumR)/BkgintimeNum );
+    
+    printf("==============================================================================================\n"); 
+    std::cout << "==> BKG AFTER SCALING: ELECTRON CANDIDATES WITHIN [-2, 2]ns =\t " <<  BkgintimeNum << std::endl ; 
+    std::cout << "==> BKG AFTER SCALING: ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  BkgtailNumL  << std::endl ; 
+    std::cout << "==> BKG AFTER SCALING: ELECTRON CANDIDATES WITH   t > 3 ns =\t" << BkgtailNumR << std::endl;  
+    std::cout << "==> BKG AFTER SCALING: ELECTRON CANDIDATES WITH  |t| > 3 ns =\t" << BkgtailNumL + BkgtailNumR << std::endl; 
+    std::cout << "==> BKG B4 SCALING: RATIO OF ELECTRON CANDIDATES  WITH t > 3 ns / |t| < 2ns =\t" <<  BkgRatioB4 << std::endl ;
+    printf("==============================================================================================\n"); 
    // hbtime->Sumw2();
    // hstime->Sumw2();
     //hs->Sumw2();
@@ -491,10 +523,12 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     std::cout <<" TOTAL BACKGROUND EVENTS AFTER SCALING ... =  " << hbtime->Integral(lowt, hit) << std::endl;
     std::cout <<" TOTAL BACKGROUND EVENTS AFTER SCALING ... =  " << hbtimenew->Integral(lowt, hit) << std::endl; 
     printf("#####################################################\n");
+    printf("==============================================================================================\n");
     std::cout <<" SCALE FACTOR USED ... =  " << sf << std::endl;
+    printf("==============================================================================================\n");
     //std::cout <<"Total Events BEFORE Subtraction =  " << hstime->Integral(lowt, hit) << std::endl;
     printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
-    std::cout <<"TOTAL EVENTS BEFORE SUBTRACTION=  " << hstimenew->Integral(lowt, hit) << std::endl;
+    std::cout <<"TOTAL SIGNAL EVENTS BEFORE BKG SUBTRACTION=  " << hstimenew->Integral(lowt, hit) << std::endl;
     printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
     //protectZeroBin( hstime );
     //protectZeroBin( hstime );
@@ -515,22 +549,25 @@ TH1F * ScaleAndSubtractHists( TH1F *hstime, TH1F *hbtime, Double_t sf )
     hbtimenew->Sumw2();
     hstimenew->Sumw2();
     hstimenew->Add(hbtimenew, -1);
-    printf("*****************************************************\n");
-    std::cout <<" TOTAL EVENTS  AFTER SUBTRACTION =  " << hstimenew->Integral(lowt, hit) << std::endl;
-    printf("*****************************************************\n");
-    tailNumL = hstimenew->Integral(lowt, binTL );    // t < -3 ns
-    tailNumR = hstimenew->Integral(binTU, hit);   // t > 3 ns
-    intimeNum = hstimenew->Integral(binWL , binWU);   // -2 < t < 2 ns
+    printf("==============================================================================================\n");
+    printf("===============  AFTER SCALING AND BKG SUBTRACTION ===========================================\n");
+    printf("==============================================================================================\n");
+    printf("******************************************************************************************\n");
+    std::cout <<" TOTAL SIGNAL EVENTS  AFTER BKG  SUBTRACTION =  " << hstimenew->Integral(lowt, hit) << std::endl;
+    printf("******************************************************************************************\n");
+    FSigtailNumL = hstimenew->Integral(lowt, binTL );    // t < -3 ns
+    FSigtailNumR = hstimenew->Integral(binTU, hit);   // t > 3 ns
+    FSigintimeNum = hstimenew->Integral(binWL , binWU);   // -2 < t < 2 ns
    
   //  Ratio = (intimeNum == 0) ? (0) : ( (tailNumL + tailNumR)/intimeNum );
-    Ratio  = (tailNumL <= 0) ? ( tailNumR/intimeNum ) : ( (tailNumL + tailNumR)/intimeNum );
+    FSigRatio  = (FSigtailNumL <= 0) ? ( FSigtailNumR/FSigintimeNum ) : ( (FSigtailNumL + FSigtailNumR)/FSigintimeNum );
     printf("======================================================================================================\n");
     
-    std::cout << "==> AFTER SUBTRACTION:  ELECTRON CANDIDATES WITHIN [-2, 2] ns =\t " <<  intimeNum << std::endl ; 
-    std::cout << "==> AFTER SUBTRACTION:  ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  tailNumL  << std::endl ; 
-    std::cout << "==> AFTER SUBTRACTION:  ELECTRON CANDIDATES WITH   t > 3 ns =\t" << tailNumR << std::endl;  
-    std::cout << "==> AFTER SUBTRACTION:  ELECTRON CANDIDATES WITH   |t| > 3 ns =\t" << tailNumL + tailNumR << std::endl; 
-    std::cout << "==> AFTER SUBTRACTION:  RATIO OF ELECTRON CANDIDATES  WITH      t > 3 ns / |t| < 2ns =\t" <<  Ratio << std::endl ;
+    std::cout << "==> SIGNAL AFTER BKG SUBTRACTION:  ELECTRON CANDIDATES WITHIN [-2, 2] ns =\t " <<  FSigintimeNum << std::endl ; 
+    std::cout << "==> SIGNAL AFTER BKG SUBTRACTION:  ELECTRON CANDIDATES WITH   t < -3 ns =\t" <<  FSigtailNumL  << std::endl ; 
+    std::cout << "==> SIGNAL AFTER BKG SUBTRACTION:  ELECTRON CANDIDATES WITH   t > 3 ns =\t" << FSigtailNumR << std::endl;  
+    std::cout << "==> SIGNAL AFTER BKG SUBTRACTION:  ELECTRON CANDIDATES WITH   |t| > 3 ns =\t" << FSigtailNumL + FSigtailNumR << std::endl; 
+    std::cout << "==> SIGNAL AFTER BKG SUBTRACTION:  RATIO OF ELECTRON CANDIDATES  WITH      t > 3 ns / |t| < 2ns =\t" <<  FSigRatio << std::endl ;
 
     printf("=======================================================================================================\n");
   

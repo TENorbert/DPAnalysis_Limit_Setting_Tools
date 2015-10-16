@@ -255,7 +255,7 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
        //read = fscanf(fitlog, "%f", &ep );
        
        CtauError[i] = 0. ;
-       Ctau[i] = ctau/10; //length in cm //ctauModel[i] ; mm to ns conversion /300mm/ns
+       Ctau[i] = ctau/300; //length in cm //ctauModel[i] ; mm to ns conversion /300mm/ns
        Lambda[i] = lambda; //lambdaModel[i] ;
        Up2sigma[i] = TwoSigUp*sgXsec*Br/eff; //(eff*lumi) ; pb to fb conversion
        Up1sigma[i] = OneSigUp*sgXsec*Br/eff; //(eff*lumi) ;
@@ -296,7 +296,7 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    //g2sig->GetXaxis()->SetLimits(1.,5.) ;
    
    TMultiGraph *gAllp = new TMultiGraph();
-   gAllp->SetTitle( " 95% CLs Limit " );
+   gAllp->SetTitle("95% CLs Limit");
    //gAllp->Draw("LPsame") ;
    gAllp->Add( g2sig ) ;
    gAllp->Add( g1sig ) ;
@@ -306,22 +306,23 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    gPad->Modified();
   // gAllp->GetXaxis()->SetLimits( Ctau[0], Ctau[NumModels-1] ) ;
    //gAllp->GetXaxis()->SetLimits( Ctau[0], 6500);//Ctau[NumModels-1] ) ;
-   gAllp->GetXaxis()->SetLimits(Ctau[0], 1200);//Ctau[NumModels-1] ) ;
+   gAllp->GetXaxis()->SetLimits(Ctau[0], 35);//Ctau[NumModels-1] ) ;
    //gAllp->SetMaximum(10);
-   ///gAllp->SetMinimum(5e-2);  // for 100 TeV
-   //gAllp->SetMaximum(1.0);
-   gAllp->SetMaximum(4e-1);
-   gAllp->SetMinimum(3e-3);   // 1e-6 for 180, 160
+   //gAllp->SetMinimum(5e-2);  // for 100 TeV
+     gAllp->SetMaximum(1.0);
+     gAllp->SetMinimum(1e-3);   // 1e-6 for 180, 160 Asymptotics
+  // gAllp->SetMaximum(4e-1);
+  // gAllp->SetMinimum(1e-3);   // 1e-6 for 180, 160
    gAllp->GetXaxis()->SetTitleOffset(1.10);
-   gAllp->GetYaxis()->SetTitleOffset(1.02);
+   gAllp->GetYaxis()->SetTitleOffset(1.35);
    gAllp->GetXaxis()->SetTitleFont(42);
    gAllp->GetYaxis()->SetTitleFont(42);
    gAllp->GetXaxis()->SetTitleSize(0.05);
-   gAllp->GetYaxis()->SetTitleSize(0.07);
+   gAllp->GetYaxis()->SetTitleSize(0.05);
    //gAllp->GetXaxis()->SetTitle("Neutralino Proper Decay Length[mm]"); //c#tau_{#chi^{0}_{1}}[mm]" ) ;
-   gAllp->GetXaxis()->SetTitle("Neutralino Proper Decay Length[cm]"); //#tau(#tilde{#chi}^{0}_{1})[ns]" ) ;
+   gAllp->GetXaxis()->SetTitle("Neutralino Mean Lifetime[ns]"); //#tau(#tilde{#chi}^{0}_{1})[ns]" ) ;
    //gAllp->GetYaxis()->SetTitle("#sigma_{UL} (pb) @ 95% CL_{s}") ;
-   gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chi}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [pb]");
+   gAllp->GetYaxis()->SetTitle("Upper Limit of #sigma #times BR[pb] @ 95\% CL");
    //gAllp->GetYaxis()->SetTitle("#sigma (#tilde{#chi}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [fb]");
    // expected
    TGraph* gMExp = new TGraph(NumModels, Ctau, MedianExp ) ;
@@ -382,15 +383,15 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    gth->SetLineStyle(1) ;
    gth->SetFillStyle(3004);
    gth->SetFillColor(kBlue);
-   gth->GetXaxis()->SetLimits( Ctau[0], 1200); //10500);// Ctau[NumModels-1] ) ;
+   gth->GetXaxis()->SetLimits( Ctau[0], 50); //10500);// Ctau[NumModels-1] ) ;
    
    // Draw Graphs
    gth->Draw("Csame") ;
    // Legend
-   std::string Tctau ="12000";
-   std::string ReadLambda = "#tilde{#chi}^{0}_{1} #rightarrow #gamma #tilde{G},  #Lambda =" + LambdaValue + " TeV";
+   std::string Tctau ="2000";
+   std::string ReadLambda = "#tilde{#chi}^{0}_{1} #rightarrow #gamma #tilde{G},  #Lambda =" + LambdaValue + " TeV, " + "m_{#tilde{#chi}^{0}_{1}}= 256 GeV/c^{2}";
    char* Lname = new char[ReadLambda.length() + 1]; // convert string to char
-   TLegend* leg1 = new TLegend(.45, .65, .95, .92 );
+   TLegend* leg1 = new TLegend(.45, .55, .95, .92 );
    // leg1->SetHeader("#tilde{#chi}^{0}_{1} #rightarrow #gamma #tilde{G},  #Lambda =160 TeV"); // M_{#tilde{#chi}^{0}_{1}}= 256 GeV/c^{2}");
   // leg->SetHeader(("c#tau(#tilde{#chi}^{0}_{1})  = "+ctau+" mm").c_str());
    //leg1->SetHeader( Lname.c_str() ); // M_{#tilde{#chi}^{0}_{1}}= 256 GeV/c^{2}");
@@ -400,7 +401,7 @@ void XsecVsCtauDraw( const std::string LambdaValue, const std::string fileName, 
    leg1->SetFillColor(0);
    leg1 ->SetTextFont(22);
   // leg1->SetFillColor(10) ;
-   //leg1->SetTextSize(0.030) ;
+   leg1->SetTextSize(0.030) ;
    leg1->AddEntry( gth, "SPS8 Theory LO Cross-Section" , "Lef");
    leg1->AddEntry( gMExp,"Expected 95% CL Upper Limit", "L");
    leg1->AddEntry( gObs, "Observed  95% CL Upper Limit", "L");
@@ -456,10 +457,10 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
         int read ;
         float  Obs_limit, TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp, eff, sgXsec, c_tau, lambda, mass, BR, lumi;
         
-        float lo68lim[nMod];
-        float hi68lim[nMod];
-        float lo95lim[nMod];
-        float hi95lim[nMod];
+        float lo68l[nMod];
+        float hi68l[nMod];
+        float lo95l[nMod];
+        float hi95l[nMod];
 	// Looop file and get limits
       for ( int i=0; i< nMod ; i++ ) {
        read = fscanf(fileIn, "%f", &Obs_limit );
@@ -494,10 +495,10 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
        //aep[i] = ep / (eff*lumi) ;
        
        // sigma bands
-       lo68lim[i] = fabs( (OneSigD - mexp)*sgXsec*BR );
-       hi68lim[i] = fabs( (OneSigUp - mexp)*sgXsec*BR );
-       lo95lim[i] = fabs( (TwoSigD - mexp)*sgXsec*BR );
-       hi95lim[i] = fabs((TwoSigUp - mexp)*sgXsec*BR  );
+       lo68l[i] = fabs( (OneSigD - mexp))*sgXsec*BR;
+       hi68l[i] = fabs( (OneSigUp - mexp))*sgXsec*BR;
+       lo95l[i] = fabs( (TwoSigD - mexp))*sgXsec*BR;
+       hi95l[i] = fabs((TwoSigUp - mexp))*sgXsec*BR;
        //printf(" mexp: %f, eff: %f , MedianExp: %f \n", mexp, eff, MedianExp[i] ) ;
        //printf(" %f, %f, %f, %f, %f \n", TwoSigD, OneSigD, mexp, OneSigUp, TwoSigUp ) ;
        if ( read != 1 ) cout<<" reading error "<<endl ;
@@ -507,7 +508,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
 
 
 // Now Do Plotting
-   TCanvas* c0 = new TCanvas("Mass exclusion limit", "Mass exclusion limit", 900, 900);
+   TCanvas* c0 = new TCanvas("Mass exclusion limit", "Mass exclusion limit", 950, 900);
    c0->cd();
    c0->SetLogy();
    // c0->SetGridx();
@@ -520,7 +521,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    //TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, exp_down_1sig, exp_up_1sig);
 
    //TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Lambda, exp_lim, LambdaEr, LambdaEr, lo68lim, hi68lim);
-   TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, lo68lim, hi68lim);
+   TGraphAsymmErrors* Onesig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, lo68l, hi68l);
    //onesig_graph->GetXaxis()->SetRangeUser(1.,5.) ;
    //onesig_graph->GetXaxis()->SetLimits(1.,5.) ;
    Onesig_graph->SetFillStyle(1001);
@@ -531,32 +532,38 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    // TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, exp_down_2sig, exp_up_2sig);
    
    //TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Lambda, exp_lim, LambdaEr, LambdaEr, lo95lim, hi95lim);
-   TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, lo95lim, hi95lim);
+   TGraphAsymmErrors* Twosig_graph = new TGraphAsymmErrors(nMod, Mass, exp_lim, MassEr, MassEr, lo95l, hi95l);
    //Twosig_graph->GetXaxis()->SetRangeUser(1.,5.) ;
    //Twosig_graph->GetXaxis()->SetLimits(1.,5.) ;
    Twosig_graph->SetFillStyle(1001);
    Twosig_graph->SetFillColor(kYellow);
    Twosig_graph->SetLineColor(kYellow);
 
-   TMultiGraph* gAllp = new TMultiGraph;
-   gAllp->Add(Twosig_graph);
-   gAllp->Add(Onesig_graph);
-   //gAllp->Add(exp_lim_graph);
-   //gAllp->Add(ul_lim_graph);
+   TMultiGraph* gAllm = new TMultiGraph;
+   gAllm->Add(Twosig_graph);
+   gAllm->Add(Onesig_graph);
+   //gAllm->Add(exp_lim_graph);
+   //gAllm->Add(ul_lim_graph);
    //Onesig_graph->Draw("FE3same");
    //Twosig_graph->Draw("FE3same");
-   gAllp->Draw("E3F same");
-   gAllp->GetYaxis()->SetRangeUser(1e-3, 6.);
-   //gAllp->GetXaxis()->SetRangeUser(50., 200);
-   gAllp->GetXaxis()->SetRangeUser(100., 500.);
-   gAllp->GetXaxis()->SetTitle("Neutralino Mass [GeV/c^{2}]");
-  // gAllp->GetXaxis()->SetTitle("#Lambda [TeV]");
-   //gAllp->GetXaxis()->SetTitle("M_{#tilde{#chi}^{0}_{1}} [GeV/c^{2}]");
-   gAllp->GetYaxis()->SetTitle("#sigma ( #tilde{#chi}^{0}_{1} #rightarrow #tilde{G}#gamma) #times BR [pb]");
+   gAllm->Draw("E3F same");
+   gAllm->GetXaxis()->SetTitleOffset(1.10);
+   gAllm->GetYaxis()->SetTitleOffset(1.30);
+   gAllm->GetXaxis()->SetTitleFont(42);
+   gAllm->GetYaxis()->SetTitleFont(42);
+   gAllm->GetXaxis()->SetTitleSize(0.05);
+   gAllm->GetYaxis()->SetTitleSize(0.05);
+   gAllm->GetYaxis()->SetRangeUser(5e-4, 10.0);
+   //gAllm->GetXaxis()->SetRangeUser(50., 200);
+   gAllm->GetXaxis()->SetRangeUser(140., 340.);
+   gAllm->GetXaxis()->SetTitle("Neutralino Mass [GeV/c^{2}]");
+  // gAllm->GetXaxis()->SetTitle("#Lambda [TeV]");
+   //gAllm->GetXaxis()->SetTitle("M_{#tilde{#chi}^{0}_{1}} [GeV/c^{2}]");
+   gAllm->GetYaxis()->SetTitle("Upper Limit of #sigma #times BR[pb] @ 95\% CL");
   
    // TGaxis* axis = new TGaxis( xmin, yposition, xmax, yposition, xlabelmin, xlabelmax,nbins, "Option")
-   //TGaxis *lambdaAxis = new TGaxis(140,4.7e-4,430,4.7e-4,100, 300, 4,"+L");
-   TGaxis *lambdaAxis = new TGaxis(140,4.7e-3,255,4.7e-3,100, 180, 4,"+L");
+   TGaxis *lambdaAxis = new TGaxis(140,2.0e-3,315,2.0e-3,100,220, 6,"+L");
+   // TGaxis *lambdaAxis = new TGaxis(140,4.7e-3,255,4.7e-3,100, 180, 4,"+L");
    lambdaAxis->SetTitle("#Lambda [TeV]");
    lambdaAxis->SetLabelSize(0.04);
    lambdaAxis->SetTitleSize(0.04);
@@ -631,7 +638,7 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    TLegend* leg = new TLegend(0.50,0.60,0.91,0.93);
    leg->SetFillStyle(0); leg->SetBorderSize(0); 
    leg->SetFillColor(0);
-   leg->SetHeader(("c#tau(#tilde{#chi}^{0}_{1})  = "+ctau+" mm").c_str());
+   leg->SetHeader(("#tilde{#chi}^{0}_{1} #rightarrow #gamma #tilde{G},  #tau(#tilde{#chi}^{0}_{1})  = "+ctau+" ns").c_str());
    leg->SetTextFont(22);
    leg->SetTextSize(0.030) ;
    
@@ -644,9 +651,9 @@ void XsecVsMassDraw(std::string ctau, std::string fName, const int nModels)
    leg->AddEntry(Twosig_graph, "#pm 2 #sigma Expected", "F");
    leg->Draw("same");
    //c0->SaveAs(("exclusion_limit_"+ctau+".eps").c_str());
-   c0->SaveAs(( "Neutralino_CrossSecVsMass_Exclusion_limit_"+ctau+".png").c_str());
-   c0->SaveAs(("Neutralino_CrosSecVsMass_Exclusion_limit_"+ctau+".pdf").c_str());
-   c0->SaveAs(("Neutralino_CrossSecVsMass_Exclusion_limit_"+ctau+".eps").c_str());
+   c0->SaveAs(( "/home/user1/norbert/public_html/LL_Neutral_Parts/EXO-13-035-LIMITS/AFTER-APPROVAL/Neutralino_CrossSecVsMass_Exclusion_limit_"+ctau+".png").c_str());
+   c0->SaveAs(("/home/user1/norbert/public_html/LL_Neutral_Parts/EXO-13-035-LIMITS/AFTER-APPROVAL/Neutralino_CrosSecVsMass_Exclusion_limit_"+ctau+".pdf").c_str());
+   c0->SaveAs(("/home/user1/norbert/public_html/LL_Neutral_Parts/EXO-13-035-LIMITS/AFTER-APPROVAL/Neutralino_CrossSecVsMass_Exclusion_limit_"+ctau+".eps").c_str());
 }
 
 //Use cms style
